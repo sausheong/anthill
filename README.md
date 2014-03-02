@@ -4,7 +4,7 @@
 
 Anthill is a simple workload distribution organizer. It allows you, the developer, to create worker nodes to distribute processing workload through an AMQ queue.
 
-
+**IMPORTANT - Anthill is experimental software as of now and cannot be considered production quality**
 
 ## How does it work?
 
