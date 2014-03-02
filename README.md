@@ -20,7 +20,7 @@ Now that you have the program, click on _Workers_ and then click on _Add new wor
 
 ![Add worker view](/readme_images/add_worker.png "Add worker view") 
 
-Enter the name of the channel you want to receive messages from and select the program that you created earlier, then click on _Start_Worker_ . 
+Enter the name of the channel you want to receive messages from and select the program that you created earlier, then click on *Start_Worker*. 
 
 This will create a worker instance from your program.
 
@@ -28,9 +28,34 @@ That's it! You've just created a worker node that will receive messages from the
 
 ## Client
 
+Clients publish messages on the queue for Anthill workers to process. You can use a number of languages and platforms including Ruby, Python, Java and C#. As long as you can write a client to send a message to a RabbitMQ server, you can send messages to Anthill for processing.
+
+Here's an example of a simple client in Ruby, using the Bunny gem.
+
+```ruby
+require 'bunny'
+require 'json'
+
+message = {from: "Alex Bell", to: "Tom Watson", message: "Mr. Watson, come here, I want to see you."}
+
+conn = Bunny.new
+conn.start
+ch = conn.create_channel
+q = ch.queue "Message", durable: true
+q.publish message.to_json, persistent: true
+puts "Sent #{message.to_json}"
+conn.close
+```
 
 
 ## Installing Anthill
+
+### Dependencies
+
+Anthill is dependent on the following software:
+
+* RabbitMQ - you need to install this before Anthill can run
+* Postgres - this allows you to persist your programs in the database (if you want something smaller, you can switch to another relational database with some minor modification of the code)
 
 
 ## Workers
@@ -52,12 +77,8 @@ As with any Ruby scripts, the last line of your program will be returned as resp
 You can find more samples of client code in the _samples_ directory.
 
 
-## Dependencies
 
-Anthill is dependent on the following software:
 
-* RabbitMQ - you need to install this before Anthill can run
-* Postgres - this allows you to persist your programs in the database (if you want something smaller, you can switch to another relational database with some minor modification of the code)
-
+## Use cases
 
 
