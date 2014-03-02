@@ -47,6 +47,8 @@ puts "Sent #{message.to_json}"
 conn.close
 ```
 
+This starts a connection with the local RabbitMQ server, creates a channel and a queue named `Message`. A JSON message is then published on the queue. Remember that when you create a worker, you can set the channel name, if you create a worker that will monitor the channel `Message`, that worker will pick up this message and process it.
+
 
 ## Installing Anthill
 
