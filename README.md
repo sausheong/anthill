@@ -38,7 +38,8 @@ Here's an example of a simple client in Ruby, using the Bunny gem.
 require 'bunny'
 require 'json'
 
-message = {from: "Alex Bell", to: "Tom Watson", message: "Mr. Watson, come here, I want to see you."}
+message = {from: "Alex Bell", to: "Tom Watson", 
+           message: "Mr. Watson, come here, I want to see you."}
 
 conn = Bunny.new
 conn.start
@@ -89,7 +90,8 @@ require 'bunny'
 require 'json'
 require 'securerandom'
 
-message = {from: "Alex Bell", to: "Tom Watson", message: "Mr. Watson, come here, I want to see you."}
+message = {from: "Alex Bell", to: "Tom Watson", 
+          message: "Mr. Watson, come here, I want to see you."}
 
 conn = Bunny.new
 conn.start
@@ -98,7 +100,8 @@ reply_q = ch.queue ""
 exchange = ch.default_exchange
 
 correlation_id = SecureRandom.uuid
-exchange.publish message.to_json, routing_key: "Reply", correlation_id: correlation_id, reply_to: reply_q.name
+exchange.publish message.to_json, routing_key: "Reply", 
+                 correlation_id: correlation_id, reply_to: reply_q.name
 
 response = nil
 reply_q.subscribe block: true do |delivery_info, properties, payload|
@@ -113,7 +116,7 @@ puts response
 conn.close
 ```
 
-The `reply_to` tells the client which queue to monitor for the response, while the `correlation_id` makes sure it's the correct response to the message it sent earlier.
+The `reply_to` tells the client which queue to monitor for the response, while the `correlation_id` makes sure it's the correct response to the message it sent earlier. The `routing_key` is the name of the queue, so you should create a worker that monitors a channel with that name.
 
 ## Workers
 
