@@ -20,21 +20,44 @@ Now that you have the program, click on _Workers_ and then click on _Add new wor
 
 ![Add worker view](/readme_images/add_worker.png "Add worker view") 
 
-Enter the name of the channel you want to receive messages from and select the program that you created earlier, then click on _Start_Worker_. 
+Enter the name of the channel you want to receive messages from and select the program that you created earlier, then click on _Start_Worker_ . 
 
 This will create a worker instance from your program.
 
 That's it! You've just created a worker node that will receive messages from the named channel. You can clone multiple copies of the same worker node if you need more processing capacity, or stop them as you like.
 
+## Client
+
+
 
 ## Installing Anthill
 
 
+## Workers
+
+Workers are started in independent threads. Anthill uses JRuby by default, meaning these are OS threads. You can also run in MRI 1.9 and above, though it will mean that the workers will run in green threads instead.
+
+Workers run in parallel and fetches 1 message at a time from the queue for processing. With more workers you can process more messages, increasing throughput of your processing. 
+
+Workers can run in two modes -- it can run in a _process-and-forget mode_ by taking the messages and processing them, or it can run in an _RPC mode_ by taking messages and processing them, then returning a response by publishing the response to a reply queue.
+
+Whether a worker runs as in either mode depends on the calling client. By default it will run in _process-and-forget_ mode. If the client passes a *reply_to* and a *correlation_id* the worker will run in *RPC mode*.
 
 ## Programs
 
 Programs are small snippets of Ruby script that you run to process messages that have been published on a queue. Programs are not meant to be full-fledged Ruby programs, so you should not write large complicated pieces of software.
 
+As with any Ruby scripts, the last line of your program will be returned as response. If you have added a *reply_to* and a *correlation_id* to the message in the send queue, the response message will be published on a reply queue with the same name as *reply_to*.
+
+You can find more samples of client code in the _samples_ directory.
+
+
+## Dependencies
+
+Anthill is dependent on the following software:
+
+* RabbitMQ - you need to install this before Anthill can run
+* Postgres - this allows you to persist your programs in the database (if you want something smaller, you can switch to another relational database with some minor modification of the code)
 
 
 
