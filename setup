@@ -1,0 +1,5 @@
+psql -h localhost -c "create user anthill with password 'anthill'"
+psql -h localhost -c "create database anthill"
+psql -h localhost -c "grant all privileges on database anthill to anthill"
+
+sequel -m migrations postgres://anthill:anthill@localhost:5432/anthill

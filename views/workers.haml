@@ -1,0 +1,62 @@
+.content
+  .row  
+    - @workers.each do |worker|  
+      .col-sm-3.col-md-3
+        .thumbnail.worker.center          
+          %div{style: 'font-size: 6em'}
+            %i.fa.fa-gear{style: 'color: skyblue'}                          
+          .text-info.center
+            &middot;
+            %a{href: "/programs/edit/#{worker.program.id}"} 
+              #{worker.program.name} 
+            &middot;
+          .lead
+            #{worker.name}
+
+          %a.btn.btn-xs.btn-danger{href:"/workers/stop/#{worker.name}"} 
+            %i.fa.fa-stop
+            stop
+          %a.btn.btn-xs.btn-info{href:"/workers/clone/#{worker.name}"}   
+            %i.fa.fa-copy
+            clone
+
+          .modal.fade{id: "view-code-#{worker.name}"}
+            .modal-dialog
+              .modal-content
+                .modal-header
+                  %a.close{'data-dismiss' => 'modal'} x
+                  &nbsp;
+                .modal-body
+                  %script{type: "syntaxhighlighter", class: "brush: ruby; toolbar: false"}
+                    :cdata
+                      #{worker.program.code}
+
+    .col-sm-3.col-md-3.muted
+      %a.thumbnail.worker-add.center{href: "#", "data-target" => "#new-worker", 'data-toggle' => 'modal'}
+        %br
+        %br
+        %div{style: 'font-size: 6em'}
+          %i.fa.fa-plus
+        .lead Start new worker
+          
+  
+#new-worker.modal.fade
+  .modal-dialog
+    .modal-content
+      .modal-header
+        %a.close{'data-dismiss' => 'modal'} x
+        %h3 
+          Start a New Worker
+      .modal-body
+        %form.well#new-worker-form{action: "/workers/start", method: 'post'}
+          .form-group
+            %label Channel
+            %input.form-control{type: "text", name: 'channel', placeholder: "Name of queue channel"}
+          .form-group
+            %label Program
+            %select.form-control{name: 'program'}
+              - @programs.each do |program|
+                %option{value: program.id}=program.name
+      .modal-footer
+        %a.wait.btn.btn-primary{href: "#", onclick: "$('#new-worker-form').submit(); return false;"} Start Worker
+        %a.btn.btn-default{href: "#", "data-dismiss" => "modal"} Cancel

@@ -1,0 +1,16 @@
+.content
+
+  .row
+    .col-md-12
+      %form{method: :post, action: "/programs"}
+        .form-group
+          %input.input-lg.form-control{name: "name", placeholder: "The name of this program", value: @program.name}
+        .form-group
+          %textarea#editor{name: 'code'}
+            :preserve
+              #{@program.code}
+    
+        %hr
+        %input{type: :hidden, name: :id, value: @program.id}
+        %button.btn.btn-lg.btn-primary{type: :submit} Modify Program
+        %a.btn.btn-lg.btn-default{href: "/programs"} Cancel

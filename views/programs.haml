@@ -1,0 +1,23 @@
+.content
+  .row  
+    - @programs.each do |program|  
+      .col-sm-3.col-md-3
+        .thumbnail.program.center
+          %div{style: 'font-size: 6em'}
+            %i.fa.fa-code{style: 'color: gold'}              
+          .lead
+            =program.name
+          %a.btn.btn-xs.btn-warning{href: "/programs/edit/#{program.id}"}  
+            %i.fa.fa-edit
+            edit
+          %a.btn.btn-xs.btn-danger{href:"/programs/delete/#{program.id}"}   
+            %i.fa.fa-times
+            delete
+            
+    .col-sm-3.col-md-3.muted
+      %a.thumbnail.program-add.center{href: "/programs/new"}
+        %br
+        %br
+        %div{style: 'font-size: 6em'}
+          %i.fa.fa-plus
+        .lead Add new program
