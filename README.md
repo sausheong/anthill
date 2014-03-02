@@ -4,6 +4,8 @@
 
 Anthill is a simple workload distribution organizer. It allows you, the developer, to create worker nodes to distribute processing workload through an AMQ queue.
 
+
+
 ## How does it work?
 
 Once you start up Anthill, go to _Programs_. 
@@ -49,16 +51,69 @@ conn.close
 
 This starts a connection with the local RabbitMQ server, creates a channel and a queue named `Message`. A JSON message is then published on the queue. Remember that when you create a worker, you can set the channel name, if you create a worker that will monitor the channel `Message`, that worker will pick up this message and process it.
 
+Here's an example in Java.
 
-## Installing Anthill
+```java
+import java.io.IOException;
+import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.MessageProperties;
 
-### Dependencies
+public class JavaClient {
+  private static final String TASK_QUEUE_NAME = "Message";
+  public static void main(String[] argv) 
+                      throws java.io.IOException {
 
-Anthill is dependent on the following software:
+    ConnectionFactory factory = new ConnectionFactory();
+    factory.setHost("localhost");
+    Connection connection = factory.newConnection();
+    Channel channel = connection.createChannel();
+    channel.queueDeclare(TASK_QUEUE_NAME, true, false, false, null);
+    String message = "Hello World";
+    channel.basicPublish( "", TASK_QUEUE_NAME, 
+            MessageProperties.PERSISTENT_TEXT_PLAIN,
+            message.getBytes());
+    System.out.println("Sent '" + message + "'");
 
-* RabbitMQ - you need to install this before Anthill can run
-* Postgres - this allows you to persist your programs in the database (if you want something smaller, you can switch to another relational database with some minor modification of the code)
+    channel.close();
+    connection.close();
+  }      
+}
+```
 
+Here's another example, with response into a reply queue.
+
+```ruby
+require 'bunny'
+require 'json'
+require 'securerandom'
+
+message = {from: "Alex Bell", to: "Tom Watson", message: "Mr. Watson, come here, I want to see you."}
+
+conn = Bunny.new
+conn.start
+ch = conn.create_channel
+reply_q = ch.queue ""
+exchange = ch.default_exchange
+
+correlation_id = SecureRandom.uuid
+exchange.publish message.to_json, routing_key: "Reply", correlation_id: correlation_id, reply_to: reply_q.name
+
+response = nil
+reply_q.subscribe block: true do |delivery_info, properties, payload|
+  if properties[:correlation_id] == correlation_id
+    response = payload.to_s      
+    delivery_info.consumer.cancel
+  end
+end
+
+puts response
+
+conn.close
+```
+
+The `reply_to` tells the client which queue to monitor for the response, while the `correlation_id` makes sure it's the correct response to the message it sent earlier.
 
 ## Workers
 
@@ -78,9 +133,42 @@ As with any Ruby scripts, the last line of your program will be returned as resp
 
 You can find more samples of client code in the _samples_ directory.
 
-
-
-
 ## Use cases
 
+Anthill's main use case is in scaling up multiple small tasks quickly. Here are some examples
+
+### Fire and forget emails
+
+Sending emails is often a necessary part of any application. A common example is firing off an email for account activation after registering for an account. If your web application sends the email directly, it will hog out the response back to the user and provide a bad user experience. Ideally you would pass this off as a job to run in the background while you send the user to another page.
+
+With Anthill you can simply publish a fire-and-forget message to the queue for an Anthill worker to pick up and send the email. If you need to know if the email has been sent successfully you can publish a message with *reply_to* and *correlation_id*. In your program, simply return the status of email sending task.
+
+### Mass processing
+
+Your user uploads an Excel spreadsheet with 1,000 addresses and you need to verify them to make sure they are valid addresses. Fortunately there are API services available for that, but unfortunately you have addresses from multiple countries, and there is no single provider who can process them all. 
+
+Firstly Anthill takes away the task of processing them online, so you can respond to the user after the upload so that he can process with his other tasks. Your application can publish 1,000 messages to Anthill, each with an address. You can write an Anthill program to parse the address and extract the country, then figure out the provider to use and call the provider API accordingly. To expedite the processing you can start up a worker with that program, and clone it 9 times to make up 10 workers processing in parallel.
+
+### Scalable API interface
+
+APIs need to be scalable. Anthill can provide a simple, scalable data source to your APIs, feeding it data.
+
+
+## Installing Anthill
+
+### Dependencies
+
+Anthill is dependent on the following software:
+
+* RabbitMQ - you need to install this before Anthill can run
+* Postgres - this allows you to persist your programs in the database (if you want something smaller, you can switch to another relational database with some minor modification of the code)
+
+### Steps
+
+1. Make sure you have RabbitMQ and Postgres installed. Postgres should be started.
+2. Make sure you have JRuby installed, or you change .ruby-version to reflect the version of Ruby you can want to use
+3. Run `bundle install`. This will install the necessary gems
+4. Run the setup script `./setup`. This will set up the database for you and run migration.
+5. Run `foreman start`. This will start RabbitMQ server and Anthill at the same time
+6. Done!
 
