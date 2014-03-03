@@ -2,7 +2,9 @@
 
 ## Introduction
 
-Anthill is a simple workload distribution organizer. It allows you, the developer, to create worker nodes to distribute processing workload through an AMQ queue.
+Anthill is a simple workload distribution organizer. It allows you, the developer, to create worker nodes to distribute processing workload through an AMQ queue. These worker are distributed evenly amongst your cores and can be scaled up and down through a simple user interface. Clients publish messages on a named queue to be picked up by the workers.
+
+While the current version runs both the queue and Anthill in the same server, they can be easily deployed separately, allowing even better scalability.
 
 **IMPORTANT - Anthill is experimental software as of now and cannot be considered production quality**
 
@@ -30,9 +32,9 @@ That's it! You've just created a worker node that will receive messages from the
 
 ## Client
 
-Clients publish messages on the queue for Anthill workers to process. You can use a number of languages and platforms including Ruby, Python, Java and C#. As long as you can write a client to send a message to a RabbitMQ server, you can send messages to Anthill for processing.
+Clients publish messages on the queue for Anthill workers to process. You can use a number of languages and platforms including Ruby, Python, Java and C#. As long as you can write a client to send a message to a [RabbitMQ](https://www.rabbitmq.com/) server, you can send messages to Anthill for processing.
 
-Here's an example of a simple client in Ruby, using the Bunny gem.
+Here's an example of a simple client in Ruby, using the [Bunny](http://rubybunny.info/) gem.
 
 ```ruby
 require 'bunny'
@@ -120,7 +122,7 @@ The `reply_to` tells the client which queue to monitor for the response, while t
 
 ## Workers
 
-Workers are started in independent threads. Anthill uses JRuby by default, meaning these are OS threads. You can also run in MRI 1.9 and above, though it will mean that the workers will run in green threads instead.
+Workers are started in independent threads. Anthill uses [JRuby](http://www.jruby.org/) by default, meaning these are OS threads. You can also run in MRI 1.9 and above, though it will mean that the workers will run in green threads instead.
 
 Workers run in parallel and fetches 1 message at a time from the queue for processing. With more workers you can process more messages, increasing throughput of your processing. 
 
@@ -163,8 +165,8 @@ APIs need to be scalable. Anthill can provide a simple, scalable data source to 
 
 Anthill is dependent on the following software:
 
-* RabbitMQ - you need to install this before Anthill can run
-* Postgres - this allows you to persist your programs in the database (if you want something smaller, you can switch to another relational database with some minor modification of the code)
+* [RabbitMQ](https://www.rabbitmq.com/) - you need to install this before Anthill can run
+* [Postgres](http://www.postgresql.org/) - this allows you to persist your programs in the database (if you want something smaller, you can switch to another relational database with some minor modification of the code)
 
 ### Steps
 
