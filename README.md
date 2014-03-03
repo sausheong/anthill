@@ -152,11 +152,14 @@ With Anthill you can simply publish a fire-and-forget message to the queue for a
 
 Your user uploads an Excel spreadsheet with 1,000 addresses and you need to verify them to make sure they are valid addresses. Fortunately there are API services available for that, but unfortunately you have addresses from multiple countries, and there is no single provider who can process them all. 
 
-Firstly Anthill takes away the task of processing them online, so you can respond to the user after the upload so that he can process with his other tasks. Your application can publish 1,000 messages to Anthill, each with an address. You can write an Anthill program to parse the address and extract the country, then figure out the provider to use and call the provider API accordingly. To expedite the processing you can start up a worker with that program, and clone it 9 times to make up 10 workers processing in parallel.
+Firstly Anthill takes away the task of processing them in real-time, so you can respond to the user after the upload so that he can do other stuff. Instead of sending a big chunk of data to Anthill, you should publish 1,000 messages to Anthill, each with an address. You can write an Anthill program to parse the address and extract the country, then figure out the provider to use and call the provider API accordingly. To expedite the processing you can start up a worker with that program, and clone it 19 times to make up 20 workers processing in parallel. As each worker completes its job, it will publish the result to a reply queue.
+
+Once the processing completes, your Anthill program can detect if the send queue is empty and publish a special message on a notify queue (which you are going to subscribe to). This will trigger you to collect the results from the reply queue.
+
 
 ### Scalable API interface
 
-APIs need to be scalable. Anthill can provide a simple, scalable data source to your APIs, feeding it data.
+APIs need to be scalable. Anthill can provide a simple, scalable data source to your APIs, feeding it data. Or it can be the API point itself, since it can accept clients in multiple languages.
 
 
 ## Installing Anthill
@@ -171,7 +174,7 @@ Anthill is dependent on the following software:
 ### Steps
 
 1. Make sure you have RabbitMQ and Postgres installed. Postgres should be started.
-2. Make sure you have JRuby installed, or you change .ruby-version to reflect the version of Ruby you can want to use
+2. Make sure you have JRuby installed, or change .ruby-version to reflect the version of Ruby you can want to use
 3. Run `bundle install`. This will install the necessary gems
 4. Run the setup script `./setup`. This will set up the database for you and run migration.
 5. Run `foreman start`. This will start RabbitMQ server and Anthill at the same time
