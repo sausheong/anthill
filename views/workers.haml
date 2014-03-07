@@ -19,17 +19,41 @@
           %a.btn.btn-xs.btn-info{href:"/workers/clone/#{worker.name}"}   
             %i.fa.fa-copy
             clone
-
-          .modal.fade{id: "view-code-#{worker.name}"}
+          %a.btn.btn-xs.btn-warning{href:"#", "data-target" => "#edit-worker-#{worker.name}", "data-toggle" => "modal"}   
+            %i.fa.fa-pencil
+            edit
+            
+          .modal.fade{id: "edit-worker-#{worker.name}"}
             .modal-dialog
               .modal-content
                 .modal-header
                   %a.close{'data-dismiss' => 'modal'} x
-                  &nbsp;
+                  %h3 
+                    Modify Worker Variables
                 .modal-body
-                  %script{type: "syntaxhighlighter", class: "brush: ruby; toolbar: false"}
-                    :cdata
-                      #{worker.program.code}
+                  %form.well{action: "/workers/modify", method: 'post', id: "modify-worker-#{worker.name}-form"}
+                    %input{type: :hidden, name: "id", value: worker.name}
+                    .form-group
+                      .row
+                        .col-md-6
+                          %input.form-control{type: "text", name: 'variable[]', placeholder: "Name", value: worker.variables.keys[0]}
+                          %input.form-control{type: "text", name: 'value[]', placeholder: "Value", value: worker.variables.values[0]}
+                        .col-md-6
+                          %input.form-control{type: "text", name: 'variable[]', placeholder: "Name", value: worker.variables.keys[1]}
+                          %input.form-control{type: "text", name: 'value[]', placeholder: "Value", value: worker.variables.values[1]}
+                      .row
+                        &nbsp;
+                      .row
+                        .col-md-6
+                          %input.form-control{type: "text", name: 'variable[]', placeholder: "Name", value: worker.variables.keys[2]}
+                          %input.form-control{type: "text", name: 'value[]', placeholder: "Value", value: worker.variables.values[2]}
+                        .col-md-6
+                          %input.form-control{type: "text", name: 'variable[]', placeholder: "Name", value: worker.variables.keys[3]}
+                          %input.form-control{type: "text", name: 'value[]', placeholder: "Value", value: worker.variables.values[3]}
+
+                .modal-footer
+                  %a.wait.btn.btn-primary{href: "#", onclick: "$('#modify-worker-#{worker.name}-form').submit(); return false;"} Modify Variables
+                  %a.btn.btn-default{href: "#", "data-dismiss" => "modal"} Cancel
 
     .col-sm-3.col-md-3.muted
       %a.thumbnail.worker-add.center{href: "#", "data-target" => "#new-worker", 'data-toggle' => 'modal'}
@@ -57,6 +81,25 @@
             %select.form-control{name: 'program'}
               - @programs.each do |program|
                 %option{value: program.id}=program.name
+          .form-group
+            %label Variables
+            .row
+              .col-md-6
+                %input.form-control{type: "text", name: 'variable[]', placeholder: "Name"}
+                %input.form-control{type: "text", name: 'value[]', placeholder: "Value"}
+              .col-md-6
+                %input.form-control{type: "text", name: 'variable[]', placeholder: "Name"}
+                %input.form-control{type: "text", name: 'value[]', placeholder: "Value"}
+            .row
+              &nbsp;
+            .row
+              .col-md-6
+                %input.form-control{type: "text", name: 'variable[]', placeholder: "Name"}
+                %input.form-control{type: "text", name: 'value[]', placeholder: "Value"}
+              .col-md-6
+                %input.form-control{type: "text", name: 'variable[]', placeholder: "Name"}
+                %input.form-control{type: "text", name: 'value[]', placeholder: "Value"}
+
       .modal-footer
         %a.wait.btn.btn-primary{href: "#", onclick: "$('#new-worker-form').submit(); return false;"} Start Worker
         %a.btn.btn-default{href: "#", "data-dismiss" => "modal"} Cancel

@@ -10,7 +10,11 @@ While the current version runs both the queue and Anthill in the same server, th
 
 ## How does it work?
 
-Once you start up Anthill, go to _Programs_. 
+Once you start up Anthill, you will see the login page. Remember Anthill requires you to log in using authserv.
+
+![Login view](/readme_images/login.png "Login view")
+
+Once you have logged in go to _Programs_. 
 
 ![Programs view](/readme_images/programs.png "Programs view")
 
@@ -18,17 +22,20 @@ Click on _Add new program_ to create a new program.
 
 ![Add program view](/readme_images/add_program.png "Programs view")
 
-Enter the name of the program, and then the program code you want to run in each worker. Click on _Create Program_ to create the program.
+Enter the name of the program, and then the program code you want to run in each worker. The message itself is a String object, that is `self`. This means you can access the message data using `self`. Click on _Create Program_ to create the program.
 
 Now that you have the program, click on _Workers_ and then click on _Add new worker_ to create a new worker.
 
 ![Add worker view](/readme_images/add_worker.png "Add worker view") 
 
-Enter the name of the channel you want to receive messages from and select the program that you created earlier, then click on *Start_Worker*. 
+Enter the name of the channel you want to receive messages from and select the program that you created earlier. If you want to pass on variables to the worker here, you can set the name and the value of the variable. The program should be able to use it as an instance variable e.g. if you had a variable named `sendgrid_account_name` then you can acccess it as `@sendgrid_account_name` in your program. Once you're done, click on *Start_Worker*. 
 
 This will create a worker instance from your program.
 
-That's it! You've just created a worker node that will receive messages from the named channel. You can clone multiple copies of the same worker node if you need more processing capacity, or stop them as you like.
+![Workers view](/readme_images/workers.png "Workers view") 
+
+That's it! You've just created a worker node that will receive messages from the named channel. You can clone multiple copies of the same worker node if you need more processing capacity, or stop them as you like. Note that once you started the worker, changing the program doesn't affect how the worker runs. However you can still change the variables on the worker.
+
 
 ## Client
 
@@ -120,6 +127,8 @@ conn.close
 
 The `reply_to` tells the client which queue to monitor for the response, while the `correlation_id` makes sure it's the correct response to the message it sent earlier. The `routing_key` is the name of the queue, so you should create a worker that monitors a channel with that name.
 
+You can find more samples of client code in the _samples_ directory.
+
 ## Workers
 
 Workers are started in independent threads. Anthill uses [JRuby](http://www.jruby.org/) by default, meaning these are OS threads. You can also run in MRI 1.9 and above, though it will mean that the workers will run in green threads instead.
@@ -130,17 +139,25 @@ Workers can run in two modes -- it can run in a _process-and-forget mode_ by tak
 
 Whether a worker runs as in either mode depends on the calling client. By default it will run in _process-and-forget_ mode. If the client passes a *reply_to* and a *correlation_id* the worker will run in *RPC mode*.
 
+When you start workers you can set variables that are used during its execution. These variables are accessed by the program as instance variables. For example if you set a variable named `sendgrid_account_name` then you can acccess it as `@sendgrid_account_name` in your program. Every worker can run the same program but with completely different variable values.
+
+Workers are transient -- when Anthill is shut down, they will not be persisted and restarted when Anthill is restarted.
+
 ## Programs
 
 Programs are small snippets of Ruby script that you run to process messages that have been published on a queue. Programs are not meant to be full-fledged Ruby programs, so you should not write large complicated pieces of software.
 
-As with any Ruby scripts, the last line of your program will be returned as response. If you have added a *reply_to* and a *correlation_id* to the message in the send queue, the response message will be published on a reply queue with the same name as *reply_to*.
+As with any Ruby scripts, the last line of your program will be returned as response. If you have added a *reply_to* and a *correlation_id* to the message in the send queue (remember that the message is created by the client), the response message will be published on a reply queue with the same name as *reply_to*.
 
-You can find more samples of client code in the _samples_ directory.
+To access the message in the queue, you can use `self`. `self` is always a String object. For example, if the message is in JSON format (typically this is what you would do), then to access the message you can parse it like this:
+
+    message = JSON.parse self
+
+The program can also access variables that are set on the worker during its execution. To access a variable you can treat it as an instance variable e.g. simply append a `@` in front of the variable name.
 
 ## Use cases
 
-Anthill's main use case is in scaling up multiple small tasks quickly. Here are some examples
+Anthill's main use case is in scaling up multiple small tasks quickly. Here are some examples:
 
 ### Fire and forget emails
 
@@ -170,10 +187,11 @@ Anthill is dependent on the following software:
 
 * [RabbitMQ](https://www.rabbitmq.com/) - you need to install this before Anthill can run
 * [Postgres](http://www.postgresql.org/) - this allows you to persist your programs in the database (if you want something smaller, you can switch to another relational database with some minor modification of the code)
+* [authserv] (https://github.com/sausheong/authserv) - this is the authentication service for Anthill. You should clone the repo, set it up (it uses Postgres for persistence too) and run it at port 8108.
 
 ### Steps
 
-1. Make sure you have RabbitMQ and Postgres installed. Postgres should be started.
+1. Make sure you have RabbitMQ, Postgres and authserv installed. Postgres and authserv should be started.
 2. Make sure you have JRuby installed, or change .ruby-version to reflect the version of Ruby you can want to use
 3. Run `bundle install`. This will install the necessary gems
 4. Run the setup script `./setup`. This will set up the database for you and run migration.

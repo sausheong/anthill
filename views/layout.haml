@@ -9,16 +9,12 @@
     %link{rel:  'stylesheet', href:  '/css/font-awesome.min.css', type:  'text/css'}
     %link{rel:  'stylesheet', href:  '/css/jquery-ui.min-1.10.2.css', type:  'text/css'}
     %link{rel:  'stylesheet', href:  '/css/google-webfonts-cedarville-cursive.css', type: 'text/css'}
-    %link{rel:  'stylesheet', href:  '/css/shCore.css', type:  'text/css'}
-    %link{rel:  'stylesheet', href:  '/css/shThemeDefault.css', type:  'text/css'}
     %link{rel:  'stylesheet', href:  '/css/codemirror.css', type:  'text/css'}
     %link{rel:  'stylesheet', href:  '/css/cobalt.css', type:  'text/css'}
     
     %script{type: 'text/javascript', src: "/js/jquery.min-1.9.1.js"}
     %script{type: 'text/javascript', src: "/js/jquery-ui.min-1.10.2.js"}
     %script{type: 'text/javascript', src: "/js/bootstrap.min.js"}
-    %script{type: 'text/javascript', src: "/js/shCore.js"}
-    %script{type: 'text/javascript', src: "/js/shBrushRuby.js"}
     %script{type: 'text/javascript', src: "/js/codemirror.js"}
     %script{type: 'text/javascript', src: "/js/ruby.js"}
     / [if lt IE 9]
@@ -33,6 +29,12 @@
             %a.navbar-brand{href: "/"} 
               %i.fa.fa-th
               Anthill
+          .navbar-collapse.pull-right
+            %ul.nav.navbar-nav
+              %li
+                %a{href: "/logout"} 
+                  %i.fa.fa-power-off
+                  Sign Out  
           .navbar-collapse.collapse
             %ul.nav.navbar-nav
               %li
@@ -44,7 +46,7 @@
                 %a{href: "/programs"} 
                   %i.fa.fa-code
                   Programs
-                
+              
       =yield
     %br
     %footer
@@ -73,7 +75,6 @@
   .footer { text-align:center; color:#999999; }
 
 :javascript
-  SyntaxHighlighter.all();
   var editor = document.getElementById("editor");
   CodeMirror.fromTextArea(editor, {
     autofocus: true,
