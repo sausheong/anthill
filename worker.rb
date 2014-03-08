@@ -1,7 +1,8 @@
 require 'bunny'
+require './models'
 
 class Worker
-  include Celluloid
+  include Celluloid, Loggable
   attr_accessor :program, :channel_name, :variables
   finalizer :finalizer
   
@@ -14,6 +15,7 @@ class Worker
     @channel.prefetch prefetch_num
     @program, @channel_name = program, channel
     @variables = variables
+    info "A new worker has started on #{channel} with #{program.name}"
     async.run
   end
   
@@ -31,13 +33,14 @@ class Worker
           if properties.reply_to and properties.correlation_id
             @exchange.publish(response.to_s, routing_key: properties.reply_to, correlation_id: properties.correlation_id)
           end
-        rescue
-          p $!
+        rescue Exception => exc
+          error exc.message
         end
         @channel.ack(delivery_info.delivery_tag)
       end
       
-    rescue Interrupt => _
+    rescue Interrupt => int
+      error int.message
       @channel.close
       @conn.close
     end
@@ -46,6 +49,7 @@ class Worker
   def finalizer
     @consumer.cancel
     @conn.close    
+    warn "#{self.name} has died"
   end
 end
 

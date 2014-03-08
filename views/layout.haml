@@ -41,12 +41,18 @@
                 %a{href: "/workers"} 
                   %i.fa.fa-gear
                   Workers
+                  - if Celluloid::Actor.all.size > 0
+                    (#{Celluloid::Actor.all.size})
             
               %li
                 %a{href: "/programs"} 
                   %i.fa.fa-code
                   Programs
-              
+
+              %li
+                %a{href: "/logs"} 
+                  %i.fa.fa-file
+                  Logs              
       =yield
     %br
     %footer

@@ -8,13 +8,23 @@ configure do
   set :protection, except: :session_hijacking  
 end
 
+helpers Loggable
 
 get "/login" do  
   haml :login, layout: false
 end
 
+get "/logs" do
+  require_login
+  page = params[:page] || 1
+  page_size = params[:page_size] || 10
+  @logs = Log.reverse_order(:created_at).paginate(page.to_i, page_size.to_i)
+  haml :logs
+end
+
 post "/auth" do
   if authenticate(params[:email], params[:password])
+    info "#{params[:email]} has logged in."
     session[:user] = params[:email]
     redirect "/"
   else
@@ -95,6 +105,7 @@ post "/programs" do
   require_login
   unless program = Program[params[:id]]
     program = Program.create
+    
   end
   program.update name: params[:name], code: params[:code]
   redirect "/programs"
