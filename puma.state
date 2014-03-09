@@ -1,0 +1,21 @@
+---
+pid: 73607
+config: !ruby/object:Puma::Configuration
+  options:
+    :min_threads: 4
+    :max_threads: 32
+    :quiet: false
+    :debug: false
+    :binds:
+    - tcp://0.0.0.0:3122
+    :workers: 0
+    :daemon: false
+    :worker_directory: /Users/sauchang/projects/anthill
+    :config_file: puma-config.rb
+    :state: puma.state
+    :mode: :http
+    :pidfile: anthill.pid
+    :control_auth_token: 59979a84d18d837ec89a612cbba8018
+    :environment: development
+    :server: puma
+    :config: ''

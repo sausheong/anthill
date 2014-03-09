@@ -1,2 +1,2 @@
-web: rackup -p 3000 --env development
+web: pumactl -F puma-config.rb start 
 rabbitmq: rabbitmq-server
