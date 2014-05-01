@@ -53,8 +53,12 @@ post "/workers/start" do
   require_login
   num = @@range.delete @@range.sample
   name = "#{params[:channel]}-#{"%03d" % num}"  
-  program = Program[params[:program]]    
-  variables = Hash[params[:variable].reject(&:empty?).zip params[:value].reject(&:empty?)]  
+  program = Program[params[:program]]   
+  if params[:variable] 
+    variables = Hash[params[:variable].reject(&:empty?).zip params[:value].reject(&:empty?)]  
+  else
+    variables = {}
+  end
   worker = Worker.new params[:channel], program, variables
   Celluloid::Actor[name.to_sym] = worker
   redirect "/workers"
@@ -88,6 +92,14 @@ get "/programs" do
   require_login
   @programs = Program.all
   haml :programs  
+end
+
+get "/programs/start/:id" do
+  require_login
+  @program = Program[params[:id]]
+  vars = @program.code.scan(/\s(@[a-z|A-Z|0-9|_]*)\b/)
+  @variables = vars.flatten unless vars.empty?
+  haml :"workers.start"    
 end
 
 get "/programs/edit/:id" do

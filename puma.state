@@ -1,5 +1,5 @@
 ---
-pid: 73607
+pid: 73995
 config: !ruby/object:Puma::Configuration
   options:
     :min_threads: 4
@@ -15,7 +15,7 @@ config: !ruby/object:Puma::Configuration
     :state: puma.state
     :mode: :http
     :pidfile: anthill.pid
-    :control_auth_token: 59979a84d18d837ec89a612cbba8018
+    :control_auth_token: ab62c587d759c2f7ec268f876176661
     :environment: development
     :server: puma
     :config: ''

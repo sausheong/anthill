@@ -4,7 +4,7 @@ require 'securerandom'
 
 message = {from: "Alex Bell", to: "Tom Watson", message: "Mr. Watson, come here, I want to see you."}
 
-conn = Bunny.new
+conn = Bunny.new(vhost: 'anthill', user: 'antman', pass: 'antpass')
 conn.start
 ch = conn.create_channel
 reply_q = ch.queue ""

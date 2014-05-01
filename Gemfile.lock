@@ -68,7 +68,7 @@ DEPENDENCIES
   haml (= 3.1.6)
   json (= 1.5.4)
   pg (~> 0.17.1)
-  pg_jruby
+  pg_jruby (~> 0.14.1.rc2)
   pony
   puma (= 2.7.1)
   rest-client (= 1.6.7)

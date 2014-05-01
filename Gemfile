@@ -7,7 +7,7 @@ gem 'celluloid', '~> 0.15.2'
 gem 'bunny', '~> 1.1.0'
 gem 'sequel', '~> 4.7.0'
 gem 'pg', '~> 0.17.1', platform: :mri
-gem 'pg_jruby', platform: :jruby
+gem 'pg_jruby', "~> 0.14.1.rc2", platform: :jruby
 
 gem 'foreman', '0.63.0'
 gem 'puma', '2.7.1'

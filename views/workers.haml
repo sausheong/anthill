@@ -1,15 +1,17 @@
 .content
   .row  
+    - if @workers.empty?
+      .lead.text-info There are no active workers at the moment.
     - @workers.each do |worker|  
       .col-sm-3.col-md-3
         .thumbnail.worker.center          
           %div{style: 'font-size: 6em'}
             %i.fa.fa-gear{style: 'color: skyblue'}                          
           .text-info.center
-            &middot;
+            [
             %a{href: "/programs/edit/#{worker.program.id}"} 
               #{worker.program.name} 
-            &middot;
+            ]
           .lead
             #{worker.name}
 
@@ -54,52 +56,3 @@
                 .modal-footer
                   %a.wait.btn.btn-primary{href: "#", onclick: "$('#modify-worker-#{worker.name}-form').submit(); return false;"} Modify Variables
                   %a.btn.btn-default{href: "#", "data-dismiss" => "modal"} Cancel
-
-    .col-sm-3.col-md-3.muted
-      %a.thumbnail.worker-add.center{href: "#", "data-target" => "#new-worker", 'data-toggle' => 'modal'}
-        %br
-        %br
-        %div{style: 'font-size: 6em'}
-          %i.fa.fa-plus
-        .lead Start new worker
-          
-  
-#new-worker.modal.fade
-  .modal-dialog
-    .modal-content
-      .modal-header
-        %a.close{'data-dismiss' => 'modal'} x
-        %h3 
-          Start a New Worker
-      .modal-body
-        %form.well#new-worker-form{action: "/workers/start", method: 'post'}
-          .form-group
-            %label Channel
-            %input.form-control{type: "text", name: 'channel', placeholder: "Name of queue channel"}
-          .form-group
-            %label Program
-            %select.form-control{name: 'program'}
-              - @programs.each do |program|
-                %option{value: program.id}=program.name
-          .form-group
-            %label Variables
-            .row
-              .col-md-6
-                %input.form-control{type: "text", name: 'variable[]', placeholder: "Name"}
-                %input.form-control{type: "text", name: 'value[]', placeholder: "Value"}
-              .col-md-6
-                %input.form-control{type: "text", name: 'variable[]', placeholder: "Name"}
-                %input.form-control{type: "text", name: 'value[]', placeholder: "Value"}
-            .row
-              &nbsp;
-            .row
-              .col-md-6
-                %input.form-control{type: "text", name: 'variable[]', placeholder: "Name"}
-                %input.form-control{type: "text", name: 'value[]', placeholder: "Value"}
-              .col-md-6
-                %input.form-control{type: "text", name: 'variable[]', placeholder: "Name"}
-                %input.form-control{type: "text", name: 'value[]', placeholder: "Value"}
-
-      .modal-footer
-        %a.wait.btn.btn-primary{href: "#", onclick: "$('#new-worker-form').submit(); return false;"} Start Worker
-        %a.btn.btn-default{href: "#", "data-dismiss" => "modal"} Cancel

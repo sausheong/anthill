@@ -7,6 +7,9 @@
             %i.fa.fa-code{style: 'color: gold'}              
           .lead
             =program.name
+          %a.btn.btn-xs.btn-primary{href:"/programs/start/#{program.id}"}   
+            %i.fa.fa-power-off
+            start
           %a.btn.btn-xs.btn-warning{href: "/programs/edit/#{program.id}"}  
             %i.fa.fa-edit
             edit

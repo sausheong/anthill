@@ -1,0 +1,29 @@
+.content
+  .row  
+
+  
+    %form.well#new-worker-form{action: "/workers/start", method: 'post'}
+      .lead Start a worker based on program #{@program.name}
+      .form-group
+        %input.input-lg.form-control{type: "text", name: 'channel', placeholder: "Name of queue channel"}
+        .help-block Please enter a queue channel name
+        %input{type: "hidden", name: "program", value: @program.id}
+      
+      .form-group
+        %label.lead Code
+        %textarea#editor{name: 'code'}
+          :preserve
+            #{@program.code}      
+        .help-block The code is not editable here. Please go to programs if you want to change it.
+      - unless @variables.nil? or @variables.empty?  
+        .form-group
+          %label.lead Variables
+    
+        - @variables.each do |var|
+          .form-group
+            %label=var
+            %input.form-control{type: "hidden", name: 'variable[]', placeholder: "Name", value: var}
+            %input.form-control{type: "text", name: 'value[]', placeholder: "Value"}
+
+      %input.btn.btn-lg.btn-primary{type: :submit, value: "Start Worker"}
+      %a.btn.btn-lg.btn-default{href: "/programs"} Cancel

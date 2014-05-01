@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Anthill is a simple workload distribution organizer. It allows you, the developer, to create worker nodes to distribute processing workload through an AMQ queue. These worker are distributed evenly amongst your cores and can be scaled up and down through a simple user interface. Clients publish messages on a named queue to be picked up by the workers.
+Anthill is a simple workload distribution system. It allows you, the developer, to create worker nodes to distribute processing workload through an AMQ queue. These worker are distributed evenly amongst your cores and can be scaled up and down through a simple user interface. Clients publish messages on a named queue to be picked up by the workers.
 
 While the current version runs both the queue and Anthill in the same server, they can be easily deployed separately, allowing even better scalability.
 
@@ -10,11 +10,11 @@ While the current version runs both the queue and Anthill in the same server, th
 
 ## How does it work?
 
-Once you start up Anthill, you will see the login page. Remember Anthill requires you to log in using authserv.
+Once you start up Anthill, you will see the login page. Remember Anthill requires you to log in using authserv. Log in to see the main view.
 
-![Login view](/readme_images/login.png "Login view")
+![Login view](/readme_images/main.png "Main view")
 
-Once you have logged in go to _Programs_. 
+Click on _Programs_. You will see a list of programs. Programs are small pieces of software that you can write (in Ruby) to run as workers.
 
 ![Programs view](/readme_images/programs.png "Programs view")
 
@@ -24,17 +24,17 @@ Click on _Add new program_ to create a new program.
 
 Enter the name of the program, and then the program code you want to run in each worker. The message itself is a String object, that is `self`. This means you can access the message data using `self`. Click on _Create Program_ to create the program.
 
-Now that you have the program, click on _Workers_ and then click on _Add new worker_ to create a new worker.
+Now that you have the program, you can click on _start_ to start a new worker based on this program.
 
-![Add worker view](/readme_images/add_worker.png "Add worker view") 
+![Start worker view](/readme_images/start_worker.png "Start worker view") 
 
-Enter the name of the channel you want to receive messages from and select the program that you created earlier. If you want to pass on variables to the worker here, you can set the name and the value of the variable. The program should be able to use it as an instance variable e.g. if you had a variable named `sendgrid_account_name` then you can acccess it as `@sendgrid_account_name` in your program. Once you're done, click on *Start_Worker*. 
+Enter the name of the queue channel you want to receive messages from and select the program that you created earlier. If you have added instance variables in your program (variables that start with `@`), they will be detected and you can set values for these variables. This means that you can potentially start workers from the same program but with different variable values. For example you can start multiple workers based on the same email-sending program, but with different accounts.  Once you're done, click on *Start_Worker*. 
 
 This will create a worker instance from your program.
 
 ![Workers view](/readme_images/workers.png "Workers view") 
 
-That's it! You've just created a worker node that will receive messages from the named channel. You can clone multiple copies of the same worker node if you need more processing capacity, or stop them as you like. Note that once you started the worker, changing the program doesn't affect how the worker runs. However you can still change the variables on the worker.
+That's it! You've just created a worker node that will receive messages from the named queue channel. You can clone multiple copies of the same worker node if you need more processing capacity, or stop them as you like. Note that once you started the worker, changing the program doesn't affect how the worker runs. However you can still change the variables on the worker.
 
 
 ## Client
@@ -128,6 +128,15 @@ conn.close
 The `reply_to` tells the client which queue to monitor for the response, while the `correlation_id` makes sure it's the correct response to the message it sent earlier. The `routing_key` is the name of the queue, so you should create a worker that monitors a channel with that name.
 
 You can find more samples of client code in the _samples_ directory.
+
+## API
+
+In addition to client programs, you can also add messages into the queue through 3 REST-based APIs. There are 2 types of APIs:
+
+* Fire-and-forget API - Add a message to the queue with PUT to `/:queue?:key1=:value1&:key2=:value2` where :queue is the queue name, and the key and values forms the message data in a hash
+* RPC API - Add a message to the queue with GET to `/:queue?:key1=:value1&:key2=:value2` or POST to `/:queue` and the key-value pairs in the body. The API will wait for a response from the queue and return the response
+
+
 
 ## Workers
 
